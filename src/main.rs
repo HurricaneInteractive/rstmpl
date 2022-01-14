@@ -1,7 +1,8 @@
 use clap::{arg, App, AppSettings};
-use std::path::{PathBuf};
 
 mod config;
+mod clone;
+use clone::Clone;
 
 fn main() {
   let matches = App::new("rstmpl")
@@ -17,16 +18,14 @@ fn main() {
 
   match matches.subcommand() {
     Some(("clone", sub_matches)) => {
-      let template_name = sub_matches.value_of("TEMPLATE").expect("required");
-      let template_dir = config::get_global_config_path().unwrap();
-      let mut path = PathBuf::new();
-      path.push(template_dir);
-      path.push(template_name);
+      let template_path = config::get_requested_template(sub_matches);
+      let result = Clone::execute(template_path);
 
-      if path.exists() {
-        println!("Cloning {}", template_name);
-      } else {
-        println!("Unable to find template {}", template_name);
+      match result {
+        Err(error) => {
+          println!("Error! {}", error);
+        }
+        _ => {}
       }
     }
     _ => unreachable!()

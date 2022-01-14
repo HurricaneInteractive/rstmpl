@@ -1,3 +1,4 @@
+use clap;
 use dirs;
 use std::path::{PathBuf};
 use std::fs;
@@ -11,7 +12,7 @@ fn create_templates_folder(home_dir: &PathBuf) -> std::io::Result<()> {
   Ok(())
 }
 
-pub fn get_global_config_path() -> Result<PathBuf, String> {
+fn get_global_config_path() -> Result<PathBuf, String> {
   let home_dir = dirs::home_dir();
 
   match home_dir {
@@ -31,4 +32,15 @@ pub fn get_global_config_path() -> Result<PathBuf, String> {
       Err("Unable to find home directory".to_string())
     }
   }
+}
+
+
+pub fn get_requested_template(sub_matches: &clap::ArgMatches) -> PathBuf {
+  let template_name = sub_matches.value_of("TEMPLATE").expect("required");
+  let template_dir = get_global_config_path().unwrap();
+  let mut path = PathBuf::new();
+  path.push(template_dir);
+  path.push(template_name);
+
+  path
 }
